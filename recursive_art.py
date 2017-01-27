@@ -5,21 +5,19 @@ import math
 from PIL import Image
 
 
-def build_random_depth(dep):
-    """
+"""def build_random_depth(dep):
     Builds the functions for the current depth and places in a list
-    """
     funcs = ['x','y','cos_pi','sin_pi','avg','prod']
     newdep = []
     for i in range(dep*2):
         if i == dep*2-1:
             func = funcs[math.floor(random.random() * 2)]
         else:
-            func = funcs[math.floor(random.random() * len(funcs))]
-        newdep.append(func)
-    return newdep
 
-def build_random_function(min_depth, max_depth, depth):
+        newdep.append(func)
+    return newdep"""
+
+def build_random_function(min_depth, max_depth, depth = 0):
     """ Builds a random function of depth at least min_depth and depth
         at most max_depth (see assignment writeup for definition of depth
         in this context)
@@ -30,19 +28,22 @@ def build_random_function(min_depth, max_depth, depth):
                  (see assignment writeup for details on the representation of
                  these functions)
     """
-    funcs = ['x','y','cos_pi','sin_pi','avg','prod']
+    normfuncs = ['cos_pi_x','sin_pi_x','cos_pi_y','sin_pi_y','avg','prod']
+    endfuncs = ['x','y']
     i = 0
-    new_func_pieces = []
+
     dep = round(random.random() * (max_depth - min_depth) + min_depth)
-    if depth > dep:
+    if depth < dep-1:
         depth += 1
-        x = build_random_function(min_depth, max_depth, dep)
-        y = build_random_function(min_depth, max_depth, dep)
+        f = normfuncs[math.floor(random.random() * len(normfuncs))]
+        x = build_random_function(min_depth, max_depth, depth)
+        y = build_random_function(min_depth, max_depth, depth)
+    else:
+        f = endfuncs[math.floor(random.random() * len(endfuncs))]
+        x = 'x'
+        y = 'y'
 
-    return new_func_pieces
-
-print(build_random_depth(5))
-print(build_random_function(4,6))
+    return [f,x,y]
 
 
 def evaluate_random_function(f, x, y):
@@ -72,14 +73,22 @@ def evaluate_random_function(f, x, y):
         if not done:
             y = evaluate_random_function(f[2],x,y)
         return y
-    if f[0] == 'cos_pi':
+    if f[0] == 'cos_pi_x':
         if not done:
             x = evaluate_random_function(f[1],x,y)
         return math.cos(math.pi*x)
-    if f[0] == 'sin_pi':
+    if f[0] == 'sin_pi_x':
         if not done:
             x = evaluate_random_function(f[1],x,y)
         return math.sin(math.pi*x)
+    if f[0] == 'cos_pi_y':
+        if not done:
+            y = evaluate_random_function(f[2],x,y)
+        return math.cos(math.pi*y)
+    if f[0] == 'sin_pi_y':
+        if not done:
+            x = evaluate_random_function(f[2],x,y)
+        return math.sin(math.pi*y)
     if f[0] == 'avg':
         if not done:
             x = evaluate_random_function(f[1],x,y)
@@ -91,9 +100,8 @@ def evaluate_random_function(f, x, y):
             y = evaluate_random_function(f[2],x,y)
         return x*y
 
-
-evaluate_random_function(['prod',['cos_pi',['avg',['x'],['y']]],['sin_pi',['x'],['y']]], .75, -.5)
-
+#evaluate_random_function(['avg',['cos_pi',['x'], ['y']],['y']], 0, .2)
+#evaluate_random_function(['prod',['cos_pi',['avg',['x'],['y']]],['sin_pi',['x'],['y']]], .75, -.5) #Actually Test This
 
 def remap_interval(val,
                    input_interval_start,
@@ -160,9 +168,9 @@ def test_image(filename, x_size=350, y_size=350):
         for j in range(y_size):
             x = remap_interval(i, 0, x_size, -1, 1)
             y = remap_interval(j, 0, y_size, -1, 1)
-            pixels[i, j] = (random.randint(0, 100),  # Red channel
-                            random.randint(0, 100),  # Green channel
-                            random.randint(0, 100))  # Blue channel
+            pixels[i, j] = (random.randint(0, 255),  # Red channel
+                            random.randint(0, 255),  # Green channel
+                            random.randint(0, 255))  # Blue channel
 
     im.save(filename)
 
@@ -174,9 +182,9 @@ def generate_art(filename, x_size=350, y_size=350):
         x_size, y_size: optional args to set image dimensions (default: 350)
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = ["x"]
-    green_function = ["y"]
-    blue_function = ["x"]
+    red_function = build_random_function()
+    green_function = build_random_function()
+    blue_function = build_random_function()
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
@@ -196,7 +204,7 @@ def generate_art(filename, x_size=350, y_size=350):
 
 if __name__ == '__main__':
     import doctest
-    doctest.run_docstring_examples(color_map, globals())
+    doctest.run_docstring_examples(build_random_function, globals())
 
     # Create some computational art!
     # TODO: Un-comment the generate_art function call after you
