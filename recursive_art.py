@@ -24,11 +24,11 @@ def build_random_function(min_depth, max_depth, depth = 0):
 
         min_depth: the minimum depth of the random function
         max_depth: the maximum depth of the random function
-        returns: the randomly generated function represented as a nested list
+        returns: the randomly generated function represented as a nested listy
                  (see assignment writeup for details on the representation of
                  these functions)
     """
-    normfuncs = ['cos_pi_x','sin_pi_x','cos_pi_y','sin_pi_y','avg','prod']
+    normfuncs = ['cos_pi_x','sin_pi_x','cos_pi','sin_pi','e^x','abs_x','abs_y','avg','prod']
     endfuncs = ['x','y']
     i = 0
 
@@ -38,12 +38,10 @@ def build_random_function(min_depth, max_depth, depth = 0):
         f = normfuncs[math.floor(random.random() * len(normfuncs))]
         x = build_random_function(min_depth, max_depth, depth)
         y = build_random_function(min_depth, max_depth, depth)
+        return [f,x,y]
     else:
         f = endfuncs[math.floor(random.random() * len(endfuncs))]
-        x = 'x'
-        y = 'y'
-
-    return [f,x,y]
+        return [f]
 
 
 def evaluate_random_function(f, x, y):
@@ -66,12 +64,12 @@ def evaluate_random_function(f, x, y):
         done = False
 
     if f[0] == 'x':
-        if not done:
-            x = evaluate_random_function(f[1],x,y)
+        #if not done:
+            #x = evaluate_random_function(f[1],x,y)
         return x
     if f[0] == 'y':
-        if not done:
-            y = evaluate_random_function(f[2],x,y)
+        #if not done:
+            #y = evaluate_random_function(f[2],x,y)
         return y
     if f[0] == 'cos_pi_x':
         if not done:
@@ -89,6 +87,40 @@ def evaluate_random_function(f, x, y):
         if not done:
             x = evaluate_random_function(f[2],x,y)
         return math.sin(math.pi*y)
+    if f[0] == 'cos_pi':
+        if not done:
+            x = evaluate_random_function(f[1],x,y)
+            y = evaluate_random_function(f[2],x,y)
+        return math.cos(math.pi*y*x)
+    if f[0] == 'sin_pi':
+        if not done:
+            x = evaluate_random_function(f[1],x,y)
+            y = evaluate_random_function(f[2],x,y)
+        return math.sin(math.pi*y*x)
+    if f[0] == 'x^2':
+        if not done:
+            x = evaluate_random_function(f[1],x,y)
+        return math.pow(x,2.0)*2-1
+    if f[0] == 'y^2':
+        if not done:
+            y = evaluate_random_function(f[2],x,y)
+        return math.pow(y,2.0)*2-1
+    if f[0] == 'e^x':
+        if not done:
+            x = evaluate_random_function(f[1],x,y)
+        return math.exp(x-1)
+    if f[0] == 'e^y':
+        if not done:
+            y = evaluate_random_function(f[2],x,y)
+        return math.exp(y-1)
+    if f[0] == 'abs_x':
+        if not done:
+            x = evaluate_random_function(f[1],x,y)
+        return abs(x)-1
+    if f[0] == 'abs_y':
+        if not done:
+            y = evaluate_random_function(f[2],x,y)
+        return abs(y)-1
     if f[0] == 'avg':
         if not done:
             x = evaluate_random_function(f[1],x,y)
@@ -99,7 +131,6 @@ def evaluate_random_function(f, x, y):
             x = evaluate_random_function(f[1],x,y)
             y = evaluate_random_function(f[2],x,y)
         return x*y
-
 #evaluate_random_function(['avg',['cos_pi',['x'], ['y']],['y']], 0, .2)
 #evaluate_random_function(['prod',['cos_pi',['avg',['x'],['y']]],['sin_pi',['x'],['y']]], .75, -.5) #Actually Test This
 
@@ -182,9 +213,16 @@ def generate_art(filename, x_size=350, y_size=350):
         x_size, y_size: optional args to set image dimensions (default: 350)
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = build_random_function()
-    green_function = build_random_function()
-    blue_function = build_random_function()
+    red_function = build_random_function(6,9)
+    green_function = build_random_function(6,9)
+    blue_function = build_random_function(6,9)
+
+    print('r: ')
+    print(red_function)
+    print('g: ')
+    print(green_function)
+    print('b: ')
+    print(blue_function)
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
@@ -209,7 +247,7 @@ if __name__ == '__main__':
     # Create some computational art!
     # TODO: Un-comment the generate_art function call after you
     #       implement remap_interval and evaluate_random_function
-    generate_art("myart.png")
+    generate_art("myart.png",300,300)
 
     # Test that PIL is installed correctly
     # TODO: Comment or remove this function call after testing PIL install
