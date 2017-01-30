@@ -93,4 +93,12 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# End of https://www.gitignore.io/api/python
+#Audio Visual Files
+*.mp3
+*.wav
+*.png
+*.avi
+*.flv
+#
+
+# End of https://www.gitignore.io/api/python'
